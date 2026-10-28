@@ -1,0 +1,280 @@
+# XOST word engine vocabulary. Plain text so it is easy to extend.
+#
+#   type | phrases (comma separated, lower case) | fields separated by " ; "
+#
+# types:   cat     a sound category                    fields: cat=Pluck
+#          kind    a specific sound family (recipes)   fields: kinds=Cat.recipe*weight ...
+#          style   a genre / artist / producer         fields: label= tags= kinds= ops= use=
+#          char    a character / mood word             fields: tags= kinds= ops= neg= use=
+#          fx      an effect / movement word           fields: tags= ops= neg=
+#          amount  scales the next word                fields: 0.5
+#          neg     "no / without" - negates the next word(s)
+#          refine  "more / less" - scales the next word and hints that you are tweaking the current sound
+#          stop    words that are understood but carry no meaning ("a", "with", "type beat"...)
+#
+# A phrase ending in "+" (e.g. "darker+") also hints at a tweak of the current sound.
+#
+# ops (applied with the word's intensity k: 1 = normal, 0.5 = "a little", 1.6 = "very", -1 = "no", -0.6 = "less"):
+#   id*f   multiply (f^k)        id+d   add (d*k)        id=v   set (k > 0 only)       id~v   move toward v
+#   o*_    = every active oscillator (oa_ ob_ oc_)       f*_ = every active filter (f1_ f2_)
+#   @lfo(dst,amount,division[,shape])  @mx(MatrixCategory)  @rk(MinirackCategory)  @chord(type[,voicing[,strum]])
+#   @arp(mode,rate,octaves)  @oct(n)  @mono(glide ms)  @poly  @uni(n)  @pitchdrop(amount,ms)
+# Turning up an effect's setting switches that effect on (starting from a gentle amount).
+
+# ------------------------------------------------------------------ sound categories
+cat | pluck, plucks, plucky, plink, plinky, pick, plucked | cat=Pluck
+cat | lead, leads, topline, synth lead, solo, melody lead, lead synth | cat=Lead
+cat | bell, bells, chime, chimes, bellz | cat=Bell
+cat | keys, key, keyboard, keyboards | cat=Keys
+cat | pad, pads, atmos, bed, wash | cat=Pad
+cat | arp, arps, arpeggio, arpeggios, arpeggiator, arpeggiated | cat=Arp
+cat | bass, basses, bassline, low end, lowend bass | cat=Bass
+cat | stab, stabs, chord hit, synth stab | cat=Stab
+cat | orchestral, orchestra, symphonic, ensemble | cat=Orchestral
+cat | vox, vocal, vocals, voice, voices, singing, vocal sound | cat=Vox
+cat | fx, sfx, effect sound, sound effect, sound effects, transition | cat=FX
+cat | motion, rhythmic synth, moving synth | cat=Motion
+
+# ------------------------------------------------------------------ specific sounds
+kind | 808, 808s, eight oh eight, boom bass, booming bass | kinds=Bass.808*2 Bass.dirty Bass.glide Bass.drill Bass.phonk
+kind | slide 808, sliding 808, glide 808, gliding 808, drill 808, slides 808 | kinds=Bass.drill*3 Bass.glide*3
+kind | distorted 808, dirty 808, clipped 808, blown 808, blown out 808, loud 808 | kinds=Bass.dirty*3 Bass.phonk*3
+kind | sub, sub bass, subs | kinds=Bass.sub*3 Bass.808
+kind | reese, reese bass | kinds=Bass.reese*3
+kind | wobble bass, dubstep bass, wub bass | kinds=Bass.wobble*3
+kind | pluck bass, bouncy bass, short bass | kinds=Bass.pluckbass*3 Bass.jerk
+kind | hyper bass, squelch bass, squelchy bass | kinds=Bass.hyper*3
+kind | pump bass, pumping bass, sidechain bass | kinds=Bass.jerk*3
+kind | piano, pianos, grand piano, felt piano, upright piano | kinds=Keys.piano*2 Keys.drill Keys.detroit Keys.cinematic
+kind | electric piano, ep, rhodes, wurli, wurlitzer, e piano | kinds=Keys.ep*2 Keys.rhodes*2 Keys.pluggnb Keys.rnb
+kind | organ, organs, church organ, pipe organ | kinds=Keys.organ*3
+kind | harpsichord, harpsi | kinds=Keys.harpsi*3
+kind | clav, clavinet | kinds=Keys.clav*3
+kind | chord keys, chord piano | kinds=Keys.chordkeys*3 Keys.pluggnb*2
+kind | guitar, guitars, acoustic guitar, nylon guitar, nylon | kinds=Pluck.nylon*2 Pluck.emo*3
+kind | electric guitar, distorted guitar, grunge guitar, fuzz guitar | kinds=Lead.emo*3
+kind | harp, harps | kinds=Pluck.harp*2 Orchestral.harp*2
+kind | koto, shamisen, japanese pluck, asian pluck | kinds=Pluck.koto*3
+kind | flute, flutes, pan flute, piccolo, recorder | kinds=Lead.flute*2 Orchestral.flute*2
+kind | whistle, whistles, whistling | kinds=Lead.sine*2 Lead.pluggnbsine*2
+kind | sine, sine wave, sine lead | kinds=Lead.sine*2 Lead.pluggnbsine*2
+kind | square, square wave, square lead | kinds=Pluck.square*2 Lead.plugg*2
+kind | saw, sawtooth, saw wave | kinds=Pluck.saw*2 Lead.uzi*2 Pad.saw
+kind | supersaw, super saw, supersaws | kinds=Lead.rage*2 Pad.saw*2 Pad.trance Arp.trance
+kind | strings, string, violin, violins, cello, viola, string section | kinds=Orchestral.strings*2 Orchestral.ghost*2 Pad.saw
+kind | pizzicato, pizz, plucked strings | kinds=Orchestral.pizz*3
+kind | brass, horn, horns, trumpet, trumpets, trombone, brass section | kinds=Orchestral.brass*2 Stab.brass*2 Stab.glo*2 Lead.future
+kind | choir, choirs, aahs, aah, oohs, ooh, chant, chanting, hymn | kinds=Pad.choir*2 Orchestral.choir*2
+kind | timpani, cinematic hit, boom hit, drum hit | kinds=Orchestral.timpani*3
+kind | music box, musicbox, lullaby, jewelry box | kinds=Bell.musicbox*3 Arp.musicbox*2
+kind | glock, glockenspiel, mallet, mallets, xylophone, marimba, vibraphone | kinds=Bell.glock*3
+kind | celesta, celeste | kinds=Bell.celesta*3
+kind | cowbell, cowbells, cow bell | kinds=Bell.cowbell*4
+kind | toy, toy piano, toy bell | kinds=Bell.toy*3
+kind | gong, ring mod, ring modulated | kinds=Bell.ring*3
+kind | church bell, church bells, tolling bell, toll, tolling, tower bell | kinds=Bell.toll*4
+kind | fm bell, fm bells | kinds=Bell.fm*3
+kind | glass bell, crystal bell, crystal | kinds=Bell.glass*2 Bell.pluggnb*2 Pad.glass
+kind | vocal chop, vocal chops, chop, chops, chopped vocal, vox chop | kinds=Vox.chop*2 Vox.jersey*2 Vox.sampleflip
+kind | talkbox, talk box, vocoder, robot voice | kinds=Vox.robot*3 Lead.autotune
+kind | ghost voice, whisper, whispers, whispering | kinds=Vox.ghost*3
+kind | sample, soul sample, sample flip, chipmunk soul, pitched sample | kinds=Vox.sampleflip*3 Pad.cloud
+kind | autotune, auto tune, tuned voice | kinds=Lead.autotune*3
+kind | siren, sirens, alarm | kinds=Lead.siren*3
+kind | hoover, rave stab, rave | kinds=Stab.rave*3
+kind | chord stab, chord stabs | kinds=Stab.chord*3 Stab.pluckstab
+kind | vamp stab, coffin hit | kinds=Stab.vampstab*3
+kind | horn stab, brass stab, brass hit | kinds=Stab.brass*2 Stab.glo*2
+kind | squeak, bed squeak, chirp, squeaks | kinds=FX.squeak*4
+kind | riser, uplifter, build up, buildup, rise, sweep up | kinds=FX.riser*4
+kind | impact, downlifter, drop hit | kinds=FX.impact*4
+kind | zap, laser, lazer, pew, blaster | kinds=FX.zap*4
+kind | drone, hum, rumble | kinds=FX.drone*3 Pad.dark
+kind | texture, textures, ambience, soundscape, atmosphere | kinds=FX.texture*2 Pad.evolve*2 Pad.fog
+kind | fx spam, sfx spam, blips, bleeps | kinds=FX.fxspam*4
+kind | sequence, sequencer, pattern, steps, step sequence | kinds=Arp.seq*3 Motion.rackseq*2
+kind | chiptune, chip, 8 bit lead, video game, arcade, nintendo, gameboy, game | kinds=Arp.chip*3 Bell.toy*2 Pluck.square*2
+kind | trance gate, gated pad | kinds=Motion.gated*4
+kind | glitch lead, digital lead | kinds=Lead.glitch*3
+kind | growl, growling, beast | kinds=Lead.growl*3 Bass.reese
+kind | bubble, bubbles, bubbly pluck | kinds=Pluck.bubble*3
+kind | plastic, rubber, latex, bubblegum | kinds=Pluck.plastic*3
+kind | fm pluck, tine, tines | kinds=Pluck.fm*3 Bell.fm
+kind | brass lead, horn lead | kinds=Lead.future*3
+kind | vocal lead, singing lead, choir lead | kinds=Lead.vocal*3
+kind | living pad, evolving pad | kinds=Motion.rackpad*3 Pad.evolve*3
+kind | wall of sound, saw pad | kinds=Pad.saw*3
+
+# ------------------------------------------------------------------ genres, artists and producers
+# (our interpretation of each style's sound - built from public descriptions of each scene, see README)
+style | trap | label=TRAP ; tags=Trap*2 ; kinds=Bass.808 Bell.fm Pluck.saw Keys.piano
+style | dark trap | label=DARK TRAP ; tags=Trap*2 Dark*2 Haunted ; kinds=Bell.metro Keys.cinematic Orchestral.ghost Bass.808 ; use=dark:0.4
+style | rage, rage beat | label=RAGE ; tags=Rage*3 ; kinds=Lead.rage*2 Pad.saw Arp.trance Bass.dirty Stab.chord
+style | hyperpop, pc music, hyper pop | label=HYPERPOP ; tags=Hyperpop*3 Sophie ; kinds=Pluck.plastic*2 Lead.hyper*2 Bass.hyper Pluck.bubble Pad.hyper
+style | ambient | label=AMBIENT ; tags=Ambient*3 Dreamy ; kinds=Pad.dream Pad.evolve Pad.fog Pad.glass
+style | plugg | label=PLUGG ; tags=Plugg*3 ; kinds=Lead.plugg*2 Pluck.square Bell.musicbox Arp.pluggarp
+style | dark plugg, evil plugg | label=DARK PLUGG ; tags=Plugg*3 Dark*2 Haunted ; kinds=Lead.plugg Bell.musicbox Lead.sine Pad.dark ; use=dark:0.5
+style | opium, opium type, opium sound | label=OPIUM ; tags=Ken_Carson*2 Destroy_Lonely*2 Carti*2 WLR*2 Rage ; kinds=Lead.rage Pad.saw Lead.vamp Bass.dirty
+style | playboi carti, carti, king vamp | label=PLAYBOI CARTI ; tags=Carti*3 Rage ; kinds=Lead.rage*2 Lead.vamp*2 Bass.dirty Pluck.saw
+style | whole lotta red, wlr, narcissist | label=WHOLE LOTTA RED ; tags=WLR*3 Rage ; kinds=Lead.vamp*3 Keys.organ*2 Stab.vampstab*2 Lead.mp3*2 ; use=distorted:0.4
+style | vamp, vampire, vamp rage | label=VAMP ; tags=WLR*2 Carti Haunted Dark ; kinds=Lead.vamp*3 Stab.vampstab*2 Keys.harpsi Keys.organ
+style | ken carson, ken carson type, x man | label=KEN CARSON ; tags=Ken_Carson*3 Rage ; kinds=Lead.rage*2 Arp.trance Lead.siren Stab.chord Pad.saw
+style | destroy lonely, destroy | label=DESTROY LONELY ; tags=Destroy_Lonely*3 Dreamy ; kinds=Pad.dream Lead.vocal Pluck.harp Keys.chordkeys ; use=dreamy:0.5
+style | osamason, osama | label=OSAMASON ; tags=Osamason*3 Gritty ; kinds=Lead.glitch*2 Bell.ring Pluck.crushed Lead.horror ; use=distorted:0.5
+style | che | label=CHE ; tags=Che*3 Rage Gritty ; kinds=Lead.siren*2 Bass.dirty Lead.growl Lead.horror ; use=distorted:0.4
+style | future, pluto, future hendrix | label=FUTURE ; tags=Future*3 Dark ; kinds=Lead.flute*2 Keys.piano Lead.future Bell.fm Pluck.muted
+style | lil uzi vert, lil uzi, uzi, uzi vert | label=LIL UZI VERT ; tags=Uzi*3 Melodic ; kinds=Lead.uzi*2 Pluck.saw Bell.celesta
+style | bleood | label=BLEOOD ; tags=Bleood*3 Hyperpop ; kinds=Lead.glitch Pluck.crushed Bass.reese Lead.hyper
+style | jetsonmade, jetson | label=JETSONMADE ; tags=Jetsonmade*3 Bouncy ; kinds=Pluck.glass*2 Bell.glock Arp.seq Pluck.fm
+style | tm88, tm 88 | label=TM88 ; tags=TM88*3 Dark ; kinds=Bell.musicbox*2 Lead.flute Keys.piano Orchestral.strings
+style | outtatown, outta town | label=OUTTATOWN ; tags=Outtatown*3 Rage ; kinds=Lead.rage*2 Pad.saw Arp.trance Stab.chord
+style | starboy, star boy | label=STARBOY ; tags=Starboy*3 Hyperpop ; kinds=Lead.hyper Pluck.bubble Pad.hyper Vox.chop
+style | richie souf, souf | label=RICHIE SOUF ; tags=Richie_Souf*3 Melodic ; kinds=Keys.ep*2 Pluck.nylon Lead.plugg Keys.chordkeys
+style | pierre bourne, pi'erre bourne, pierre, pi'erre, pierre bourne type | label=PIERRE BOURNE ; tags=Pierre_Bourne*3 Plugg Bouncy ; kinds=Pluck.square*2 Lead.plugg*2 Arp.pluggarp Keys.clav Arp.seq
+style | clayco | label=CLAYCO ; tags=Clayco*3 Ambient ; kinds=Pad.glass Pad.evolve Bell.glass
+style | loesoe | label=LOESOE ; tags=Loesoe*3 Plugg LoFi ; kinds=Bell.musicbox*2 Lead.sine Pluck.tape Pad.fog ; use=lofi:0.4
+style | ginseng | label=GINSENG ; tags=Ginseng*3 Dreamy ; kinds=Keys.rhodes*2 Pad.dream Lead.sine Pluck.tape
+style | brandon finessin, brandon | label=BRANDON FINESSIN ; tags=Plugg*2 Bouncy Pierre_Bourne ; kinds=Lead.plugg*2 Pluck.square Bell.toy
+style | thrty, boolymon, margiela, mexiko dro, mexikodro, stoopidxool | label=DARK PLUGG ; tags=Plugg*3 Dark*2 ; kinds=Lead.plugg Bell.musicbox Lead.sine Pad.dark ; use=dark:0.5
+style | yeat, yeat type, lyfe, twizzy | label=YEAT ; tags=Yeat*3 Rage ; kinds=Bell.toll*3 Lead.yeat*2 Bell.fm
+style | bnyx | label=BNYX ; tags=Bnyx*3 Yeat ; kinds=Bell.toll*2 Lead.yeat*2 Pad.saw
+style | synthetic | label=SYNTHETIC ; tags=Yeat*2 Jersey_Club ; kinds=Bell.toll*2 Vox.jersey Lead.yeat
+style | f1lthy, filthy beat, working on dying, wod | label=F1LTHY ; tags=F1lthy*3 WLR Rage ; kinds=Lead.mp3*3 Lead.rage Pad.saw Lead.vamp ; use=lofi:0.35
+style | maaly raw | label=MAALY RAW ; tags=Uzi*2 Rage ; kinds=Lead.uzi*2 Lead.rage
+style | pluggnb, plugg n b, plugg and b, plugg rnb | label=PLUGGNB ; tags=Pluggnb*3 Plugg ; kinds=Keys.pluggnb*3 Lead.pluggnbsine*2 Bell.pluggnb*2
+style | summrs, autumn, xangang, arizona tears, arizonatears, wintfye | label=PLUGGNB ; tags=Pluggnb*3 Summrs*2 Autumn ; kinds=Keys.pluggnb*3 Lead.pluggnbsine*2 Bell.pluggnb*2
+style | jerk, jerk music, jerk beat, jug, jugg | label=JERK ; tags=Jerk*3 ; kinds=Lead.jerk*3 Bass.jerk*2 FX.fxspam*2 Pluck.crushed
+style | xaviersobased, xavier, nettspend, kashpaint, fakemink, esdeekid, 1c34 | label=JERK ; tags=Jerk*3 Xaviersobased*2 Nettspend ; kinds=Lead.jerk*3 Bass.jerk*2 FX.fxspam*2
+style | phonk | label=PHONK ; tags=Phonk*3 ; kinds=Bell.cowbell*4 Bass.phonk*3 Keys.memphis*2 ; use=lofi:0.3
+style | drift phonk, kordhell, dvrst, kaito shoma, pharmacist, brazilian phonk | label=DRIFT PHONK ; tags=Phonk*3 Kordhell*2 ; kinds=Bell.cowbell*4 Bass.phonk*3 ; use=distorted:0.4
+style | memphis, memphis rap, three 6, three six, three 6 mafia, three six mafia, dj smokey, lil ugly mane | label=MEMPHIS ; tags=Phonk*2 LoFi Dark ; kinds=Keys.memphis*3 Bell.cowbell*2 Bass.phonk ; use=lofi:0.6
+style | digicore, glitchcore, digi | label=DIGICORE ; tags=Digicore*3 Hyperpop ; kinds=Pluck.digicore*3 Lead.autotune*2 Lead.hyper Pluck.bubble
+style | glaive, ericdoa, quannnic, midwxst, jane remover | label=DIGICORE ; tags=Digicore*3 Glaive*2 ; kinds=Pluck.digicore*3 Lead.autotune*2 Pluck.bubble
+style | sigilkore, sigil, krushclub, luci4, islurwhenitalk, odetari, 9lives, jewelxxet | label=SIGILKORE ; tags=Sigilkore*3 Luci4*2 ; kinds=Pad.sigil*3 Lead.sigil*3 FX.fxspam ; use=bitcrush:0.4
+style | cloud rap, cloud, based, clams casino, clams, lil b | label=CLOUD RAP ; tags=Cloud*3 Clams_Casino*2 ; kinds=Pad.cloud*3 Vox.sampleflip*2 Pad.dream ; use=wet:0.4
+style | drain gang, drain, bladee, whitearmor, yung lean, ecco2k, sad boys, gud | label=DRAIN GANG ; tags=Drain_Gang*3 Cloud ; kinds=Pad.trance*3 Pluck.drain*3 Pad.dream
+style | trance, trancey | label=TRANCE ; tags=Drain_Gang Rage ; kinds=Pad.trance*3 Arp.trance*2 Lead.rage
+style | jersey club, jersey, jersey drill, club, baltimore club, mcvertt, bandmanrill, sliink | label=JERSEY CLUB ; tags=Jersey_Club*3 Bouncy ; kinds=Vox.jersey*3 FX.squeak*2 Vox.chop
+style | drill, uk drill, ny drill, brooklyn drill, bronx drill, m1onthebeat, m1, ghosty, axl beats | label=DRILL ; tags=Drill*3 M1onthebeat ; kinds=Bass.drill*3 Keys.drill*3 Orchestral.strings Bell.metro
+style | chicago drill, glo, glo gang, chief keef, sosa, young chop, king von | label=CHICAGO DRILL ; tags=Drill*2 Dark ; kinds=Stab.glo*3 Bell.fm Bass.drill
+style | sexy drill, cash cobain, slizzy, chow lee | label=SEXY DRILL ; tags=Sexy_Drill*3 RnB Cash_Cobain*2 ; kinds=Keys.rnb*3 Vox.sampleflip*2 Bass.drill
+style | detroit, detroit rap, helluva, tee grizzley, 42 dugg, babyface ray, sada baby, flint, est gee | label=DETROIT ; tags=Detroit*3 ; kinds=Keys.detroit*3 Bass.drill*2 Keys.piano
+style | metro boomin, metro, southside, 808 mafia, wheezy, tay keith | label=METRO BOOMIN ; tags=Metro_Boomin*3 Southside Dark ; kinds=Bell.metro*3 Keys.cinematic*3 Orchestral.ghost*2 Lead.flute*2
+style | emo rap, emo, lil peep, peep, juice wrld, juice, gothboiclique, xxxtentacion | label=EMO RAP ; tags=Emo*3 Lil_Peep*2 ; kinds=Pluck.emo*3 Lead.emo*2 Pluck.nylon
+style | sematary, haunted mound, horrorcore, horror rap, ghost mountain | label=SEMATARY ; tags=Sematary*3 Dark Haunted ; kinds=Lead.horror*3 Pad.dark Keys.organ ; use=distorted:0.4 haunted:0.5
+style | sophie, ag cook, a g cook, 100 gecs, umru, charli xcx, underscores | label=HYPERPOP ; tags=Hyperpop*3 Sophie*2 AG_Cook ; kinds=Pluck.plastic*3 Bass.hyper*2 Lead.hyper
+style | prettifun, slayr, edward skeletrix, nine vicious, lucy bedroque, extreme rage | label=EXTREME RAGE ; tags=Rage*2 Osamason Gritty ; kinds=Lead.horror*2 Lead.glitch*2 Lead.mp3 Bass.dirty ; use=distorted:0.6
+style | lancey foux, fimiguerrero, uk rage | label=UK RAGE ; tags=Rage*2 ; kinds=Lead.rage*2 Lead.mp3
+style | trippie redd, trippie | label=TRIPPIE REDD ; tags=Rage Emo Melodic ; kinds=Lead.rage Pluck.emo Lead.uzi
+style | sofaygo | label=SOFAYGO ; tags=Rage Melodic Uzi ; kinds=Lead.uzi*2 Pluck.saw
+style | rnb, r&b, r and b, rhythm and blues, neo soul | label=R&B ; tags=RnB*3 Soft ; kinds=Keys.rnb*2 Keys.ep*2 Keys.pluggnb
+style | lowend, low end beat, milwaukee | label=LOWEND ; tags=Jerk*2 ; kinds=Bass.jerk*2 Bass.808 Lead.jerk
+style | anime | label=ANIME ; tags=Dreamy Melodic ; kinds=Bell.celesta Pluck.glass Pad.dream
+
+# ------------------------------------------------------------------ character / mood
+char | dark, darker+, moody, moodier+, gloomy, murky | tags=Dark*1.2 ; ops=f*_cutoff*0.6 eq_high-3 rev_damp+0.15
+char | bright, brighter+, brilliant, open, airy top | tags=Bright*1.2 ; ops=f*_cutoff*1.7 eq_high+3
+char | warm, warmer+, cozy, toasty | tags=Soft ; ops=f*_cutoff*0.8 eq_low+2 eq_high-1.5 tape_sat+0.15 drift+0.1
+char | cold, colder+, icy, frozen, frosty, ice | tags=Glassy ; ops=f*_cutoff*1.2 eq_low-2 rev_damp-0.2 ch_mix+0.1
+char | glassy, glass, crystalline, crystal clear | tags=Glassy*2 ; kinds=Pluck.glass Bell.glass Pad.glass ; ops=eq_high+2 rev_damp-0.15
+char | metallic, metal, metalic, clangy, clanky, industrial | tags=Glassy Gritty ; kinds=Bell.ring Bell.toll Pluck.plastic ; ops=f1_reso+0.15 eq_mid+3 eq_midfreq~3000
+char | soft, softer+, gentle, mellow, delicate, light | tags=Soft*1.5 ; ops=f*_cutoff*0.8 e1_attack+6 dist_mix*0.5 eq_high-2
+char | hard, harder+, aggressive, harsh, angry, intense, violent | tags=Gritty Rage ; ops=dist_drive+0.2 dist_mix+0.25 f*_cutoff*1.25 comp_gain+2
+char | gritty, grittier+, dirty, dirtier+, grimy, nasty, filthy, grungy, raw | tags=Gritty*1.5 ; ops=dist_drive+0.25 dist_mix+0.3 shp_drive+0.1
+char | clean, cleaner+, pure, pristine, polished, crisp | tags=Clean*1.5 ; ops=dist_mix*0.3 tape_sat*0.4 tape_hiss*0.2 drift*0.5 eq_high+1
+char | airy, breathy, breath, breathing, windy | tags=Soft Dreamy ; ops=noise_level+0.08 noise_type=1 eq_high+2
+char | hollow, nasal, boxy | ops=eq_mid-5 eq_midfreq~900 ; kinds=Keys.organ Pluck.muted
+char | wide, wider+, stereo, spread, panoramic | tags=Wide*1.5 ; ops=out_width+0.35 o*_width+0.2 ch_mix+0.12
+char | narrow, narrower+, centered, centred, mono sound | ops=out_width-0.5 o*_width-0.4
+char | detuned, detune, out of tune, untuned, off key | tags=Detuned*1.5 ; ops=o*_detune+0.15 @uni(2) drift+0.2
+char | fat, fatter+, thick, thicker+, big, bigger+, huge, massive, chunky, beefy | tags=Wide Detuned ; ops=@uni(2) o*_detune+0.08 sub_level+0.2 eq_low+2 out_width+0.15
+char | thin, thinner+, small, tiny, weak, skinny | ops=eq_low-4 out_width-0.2 f*_cutoff*1.1 @uni(-2)
+char | lofi, lo fi, lo-fi, dusty, vintage, old, nostalgic, vinyl, worn, aged | tags=LoFi*2 ; ops=tape_age+0.3 tape_wow+0.2 tape_hiss+0.05 tape_sat+0.1 f*_cutoff*0.85
+char | retro, 80s, eighties, 90s, nineties, old school, oldschool, throwback | tags=Retro*2 ; ops=drift+0.2 ch_mix+0.15
+char | digital, futuristic, modern, cyber, techy | tags=Clean ; ops=drift*0.3
+char | analog, analogue, vintage synth, warm analog | ops=drift+0.3 tape_sat+0.1 f1_drive+0.1
+char | dreamy, dreamier+, ethereal, heavenly, angelic, floaty, floating, celestial, dream | tags=Dreamy*2 ; ops=rev_mix+0.15 rev_decay*1.4 ch_mix+0.1 e1_attack+20
+char | haunted, eerie, spooky, creepy, ghostly, ghost, scary, horror, haunting, cursed | tags=Haunted*2 Dark ; ops=rev_mix+0.15 rev_decay*1.5 drift+0.2
+char | sad, sadder+, emotional, melancholy, melancholic, depressing, depressed, heartbreak, heartbroken, lonely, crying, pain, painful | tags=Melodic Soft Dreamy ; kinds=Keys.piano Pluck.nylon Pluck.emo Keys.ep ; ops=f*_cutoff*0.85 rev_mix+0.1
+char | happy, happier+, cute, sweet, playful, cheerful, uplifting, joyful, fun | tags=Bright Bouncy ; kinds=Pluck.bubble Bell.glock Bell.toy Pluck.plastic ; ops=f*_cutoff*1.2
+char | evil, sinister, menacing, ominous, demonic, villain, wicked, satanic | tags=Dark Haunted ; kinds=Keys.harpsi Keys.organ Lead.vamp Bell.metro ; ops=f*_cutoff*0.75 dist_mix+0.1
+char | bouncy, bouncier+, bounce, springy, hoppy | tags=Bouncy*2 ; ops=e1_decay*0.75 e1_sustain*0.7
+char | punchy, punchier+, snappy, snappier+, tight, tighter+ | ops=e1_attack*0.3 e1_decay*0.8 comp_gain+1.5 comp_ratio+1
+char | short, shorter+, staccato, quick, brief, clipped short | ops=e1_decay*0.55 e1_release*0.5 rev_mix*0.8
+char | long, longer+, sustained, held, lingering, endless | ops=e1_decay*1.8 e1_release*1.8 e1_sustain+0.2
+char | swell, swelling, fade in, slow attack, bowed, rising up | ops=e1_attack~700
+char | fast attack, instant, sharp attack | ops=e1_attack*0.2
+char | smooth, smoother+, silky, buttery, velvet, velvety | tags=Soft ; ops=f1_reso*0.7 dist_mix*0.6 ch_mix+0.08
+char | crunchy, crunchier+, crispy, crusty, crushed sound | tags=Gritty LoFi ; ops=dist_type=3 dist_drive+0.25 dist_mix+0.3
+char | fuzzy, fuzz, buzzy, buzzing | tags=Gritty ; ops=dist_type=4 dist_drive+0.25 dist_mix+0.3
+char | wet, wetter+, washed, washy, drenched, soaked, drowned | ops=rev_mix+0.25 dly_mix+0.1
+char | dry, drier+, dryer+, upfront, in your face, direct | ops=rev_mix*0.35 dly_mix*0.35
+char | deep, deeper+, low, lower+, subby, down an octave, octave down, pitched down | ops=@oct(-1) eq_low+2
+char | high, higher+, up an octave, octave up, pitched up, chipmunk | ops=@oct(1)
+char | underwater, muffled, submerged, filtered, behind a wall | ops=f*_cutoff*0.35 ch_mix+0.2 rev_mix+0.1
+char | distant, far, far away, background, faded | ops=rev_mix+0.25 f*_cutoff*0.7 rev_pre+20 out_width-0.1
+char | spacey, space, spacy, cosmic, galactic, astral, outer space, stellar | tags=Dreamy Wide ; ops=rev_decay*1.8 rev_mix+0.2 dly_mix+0.12 @lfo(apos,0.25,2bar,smooth)
+char | cinematic, epic, film, movie, score, dramatic, orchestral sound | tags=Wide Haunted ; kinds=Orchestral.strings Orchestral.ghost Keys.cinematic ; ops=rev_size+0.2 rev_mix+0.15 out_width+0.2
+char | glitchy, glitch, glitched, broken, corrupted, error | tags=Gritty LoFi ; kinds=Lead.glitch Motion.stutter FX.fxspam ; ops=@mx(Time)
+char | chaotic, random, unpredictable, crazy sound, wild, unstable | tags=Moving ; ops=@rk(Chaos)
+char | wonky, drunk, wobbly, seasick, warped, warbly, wavy, woozy | ops=tape_wow+0.4 drift+0.35
+char | organic, natural, acoustic, real, realistic | kinds=Pluck.nylon Pluck.harp Keys.piano Orchestral.pizz ; ops=drift+0.15
+char | robotic, robot, vocoded, mechanical | kinds=Vox.robot Lead.autotune
+char | sparkly, shiny, shimmer, shimmery, glittery, twinkly, twinkle, glossy | tags=Bright Glassy ; kinds=Bell.celesta Bell.glass Pluck.digicore ; ops=eq_high+3 rev_mix+0.1
+char | round, rounder+, rounded | ops=f1_reso*0.8 f*_cutoff*0.85
+char | sharp, sharper+, piercing, cutting, biting, edgy | ops=f*_cutoff*1.4 f1_reso+0.1 eq_mid+2 eq_midfreq~3000
+char | chill, chilled, relaxed, calm, laid back, laidback, peaceful, lofi chill | tags=Soft Dreamy ; ops=f*_cutoff*0.85 rev_mix+0.08
+char | muddy, mud, muddier+, murk | ops=f*_cutoff*0.6 eq_low+2
+char | heavy, heavier+, hard hitting, hits hard, slapping, knocking | tags=Gritty ; ops=eq_low+2 dist_mix+0.1 comp_gain+1
+char | intimate, close, closer+, personal | ops=rev_mix*0.5 out_width-0.2
+char | moving, evolving, alive, animated, morphing, movement, living | tags=Moving*2 ; ops=@lfo(apos,0.3,2bar,smooth) @rk(Movement)
+char | static, still, steady, stable | ops=mx_on=0 rk_on=0 drift*0.3
+char | jazzy, jazz, soulful, smooth jazz | tags=Pluggnb RnB Chords ; ops=@chord(min9,1)
+
+# ------------------------------------------------------------------ effects and movement
+fx | reverb, verb, reverby, roomy, room, hall, space verb | ops=rev_mix+0.22 rev_decay*1.4 ; neg=rev_on=0
+fx | huge reverb, cathedral, church verb, massive reverb, infinite reverb, shimmer verb | ops=rev_mix+0.3 rev_decay*3 rev_size+0.35 ; neg=rev_on=0
+fx | delay, echo, echoes, echoey, echoing, ping pong, delayed | ops=dly_mix+0.18 dly_fb+0.12 ; neg=dly_on=0
+fx | chorus, chorused, ensemble effect | ops=ch_mix+0.3 ch_depth+0.15 ; neg=ch_on=0
+fx | phaser, phased, phasing, phasey | ops=ph_mix+0.3 ; neg=ph_on=0
+fx | flanger, flanged, flanging, jet flanger | ops=fl_mix+0.3 ; neg=fl_on=0
+fx | distortion, distorted, overdrive, overdriven, blown, blown out, clipped, clipping, driven | tags=Gritty ; ops=dist_drive+0.35 dist_mix+0.4 ; neg=dist_on=0
+fx | bitcrush, bitcrushed, bit crushed, bitcrusher, crushed, 8 bit, 8bit, eight bit, downsampled, lossy, mp3 | tags=LoFi Gritty ; ops=dist_type=3 dist_drive+0.35 dist_mix+0.45 ; neg=dist_on=0
+fx | tape, cassette, tape saturation, tape wobble, vhs | tags=LoFi ; ops=tape_wow+0.3 tape_flutter+0.2 tape_sat+0.2 tape_hiss+0.05 tape_age+0.3 ; neg=tape_on=0
+fx | saturation, saturated, warm drive, soft clip | ops=tape_sat+0.35 shp_drive+0.15 ; neg=shp_on=0
+fx | compression, compressed, squashed, smashed, compressor | ops=comp_ratio+3 comp_thresh-8 comp_gain+3 ; neg=comp_on=0
+fx | sidechain, sidechained, side chain, pumping, pump, ducking, ducked, ducks | tags=Moving ; ops=@mx(Sidechain) ; neg=mx_on=0
+fx | gate, gated, chopped, choppy, trance gate effect, stuttered gate | tags=Moving ; ops=@mx(Gate) ; neg=mx_on=0
+fx | stutter, stuttering, repeat, repeater, glitch effect, beat repeat | tags=Moving ; ops=@mx(Time) ; neg=mx_on=0
+fx | wobble, wub, wubs, lfo, wobbling | tags=Moving ; ops=@lfo(cut1,0.35,1/8,sine)
+fx | vibrato, quiver, vibratos | ops=@lfo(apitch,0.004,free5.5,sine)
+fx | tremolo, trem | ops=@lfo(amp,0.45,1/16,sine)
+fx | autopan, auto pan, panning, panned, spinning, rotating | tags=Wide Moving ; ops=@mx(Pan)
+fx | filter sweep, sweep, sweeping, filter movement, opening filter, filtered sweep | tags=Moving ; ops=@lfo(cut1,0.4,4bar,sine)
+fx | glide, slide, slides, sliding, portamento, legato, gliding | ops=@mono(140)
+fx | pitch drop, dive, pitch dive, drop pitch, falling, pitch fall | ops=@pitchdrop(0.25,60)
+fx | noise, hiss, crackle, vinyl crackle, static noise, air noise | tags=LoFi ; ops=noise_level+0.1 tape_hiss+0.08
+fx | sub layer, with sub, add sub, sub underneath, layered sub | ops=sub_level+0.4 ; neg=sub_on=0
+fx | chords, chord, chordal, full chord, chord memory | tags=Chords*2 ; ops=@chord(min7) ; neg=chord_type=0
+fx | minor chord, minor chords, minor | tags=Chords ; ops=@chord(minor)
+fx | major chord, major chords, major | tags=Chords ; ops=@chord(major)
+fx | seventh, 7th, sevenths, min7, minor 7 | tags=Chords ; ops=@chord(min7)
+fx | ninth, 9th, ninths, min9, add9, minor 9 | tags=Chords ; ops=@chord(min9,1)
+fx | power chord, power chords, fifths | tags=Chords ; ops=@chord(power)
+fx | sus, sus2, suspended | tags=Chords ; ops=@chord(sus2)
+fx | strum, strummed, strumming, rolled chord | tags=Chords ; ops=@chord(min7,1,70)
+fx | arpeggiate, arpeggiated sound, arping, arped, running notes | tags=Arp ; ops=@arp(up,1/16,2) ; neg=arp_on=0
+fx | mono, monophonic, monosynth, one note at a time | ops=@mono(0)
+fx | poly, polyphonic | ops=@poly
+fx | unison, stacked, layered, doubled | tags=Detuned ; ops=@uni(3) o*_detune+0.1
+fx | octave, octaves, octave layer | ops=@uni(1)
+
+# ------------------------------------------------------------------ amounts, negation, refine words
+amount | a little, a lil, a bit, bit, slightly, slight, kinda, kind of, sort of, somewhat, subtle, subtly, lightly, a touch of, touch of, a hint of, hint of, mild, mildly, little | 0.5
+amount | very, really, super, extra, so, hella, mad, heavily, lots of, a lot of, tons of, much, plenty of, strong, strongly, deeply, quite | 1.6
+amount | extremely, insanely, crazy, ultra, max, maximum, maxed, totally, completely, way, absurdly, ridiculously | 2.2
+neg | no, without, zero, minus, remove, kill, turn off, take off, get rid of, not, non, none, nothing, w/o
+refine | more, add, increase, boost, turn up, bring up, raise, plus, make it, make the sound | 1
+refine | less, reduce, decrease, turn down, bring down, cut, tone down, lessen, fewer | -0.6
+
+stop | a, an, the, sound, sounds, sounding, like, with, and, or, for, some, something, that, this, it, its, is, make, me, give, i, want, need, please, type, beat, beats, style, vibe, vibes, sort, similar, to, ish, of, in, on, my, of the, kind, synth, synthesizer, patch, preset, tone, one, ones, using, use, but, also, too, by, from, at, as, into, onto, feel, feeling, track, song, prod, produced, producer, made, inspired, inspo, 'n, n, &, y, u, ur, your, has, have, got, gotta, lowkey, highkey, type beat, beat style
