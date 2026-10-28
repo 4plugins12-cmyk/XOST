@@ -1,0 +1,71 @@
+name: Build XOST
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+          - name: macOS
+            os: macos-latest
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find the XOST source
+        shell: bash
+        run: |
+          # works whether the files are at the top of the repo or inside a folder
+          file=$(grep -rl --include=CMakeLists.txt "juce_add_plugin(XOST" . | grep -v "/JUCE/" | head -1)
+          if [ -z "$file" ]; then
+            echo "::error::Couldn't find the XOST source files. Upload CMakeLists.txt, README.md and the Source, Resources, Tests and tools folders from XOST.zip to this repository."
+            exit 1
+          fi
+          dir=$(dirname "$file")
+          echo "Found project in: $dir"
+          echo "PROJECT_DIR=$dir" >> "$GITHUB_ENV"
+
+      - name: Configure
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: cmake --build build --config Release --target XOST_VST3 --parallel
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          cmake --build build --config Release --target XOST_VST3 XOST_AU --parallel
+          # ad-hoc sign so Apple Silicon Macs will load the bundles
+          codesign --force --deep --sign - build/XOST_artefacts/Release/VST3/XOST.vst3
+          codesign --force --deep --sign - build/XOST_artefacts/Release/AU/XOST.component
+
+      - name: Package
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          cp -R build/XOST_artefacts/Release/VST3/XOST.vst3 "$GITHUB_WORKSPACE/out/"
+          if [ -d build/XOST_artefacts/Release/AU/XOST.component ]; then
+            cp -R build/XOST_artefacts/Release/AU/XOST.component "$GITHUB_WORKSPACE/out/"
+          fi
+          cp README.md "$GITHUB_WORKSPACE/out/" || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: XOST-${{ matrix.name }}
+          path: out
